@@ -21,7 +21,6 @@ Below is a list of all artifacts that will be provisioned:
 
 ## Provision infrastructure using Oracle Resource Manager (ORM)
 
-1. clone repo `git clone git@github.com:oracle-quickstart/oci-digital-assistant-external-services.git`
 1. Download [`oci-digital-assistant-external-services-v1.0.0.zip`](../../releases/download/v1.0.0/oci-digital-assistant-external-services-v1.0.0.zip) file
 1. From Oracle Cloud Infrastructure **Console/Resource Manager**, create a new stack.
 1. Make sure you select **My Configurations** and then upload the zip file downloaded in the previous step.
