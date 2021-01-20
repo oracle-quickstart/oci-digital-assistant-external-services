@@ -48,8 +48,8 @@ If you later decide to delete the created artifacts, click **Terraform Actions**
    cd oci-digital-assistant-external-services/deploy/terraform
    ```
 
-1. Create a copy of the **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars.example** file in the same directory and name it **terraform.tfvars**.
-1. Open the newly created **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars** file and add your Oracle Cloud Infrastructure user and tenant details to the TF Requirements section.
+1. Create a copy of the **oci-digital-assistant-external-services/terraform.tfvars.example** file in the same directory and name it **terraform.tfvars**.
+1. Open the newly created **oci-digital-assistant-external-services/terraform.tfvars** file and add your Oracle Cloud Infrastructure user and tenant details to the TF Requirements section.
 
         ```
            #*************************************
