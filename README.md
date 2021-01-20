@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This solution provision and configure the needed infrastructure to deploy [Oracle Digital Assistant (**_ODA_**)](https://docs.oracle.com/en-us/iaas/digital-assistant/index.html) custom components/webviews externally to [Oracle Kubernetes Engine (**_OKE_**)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) using [Terraform](https://www.terraform.io/docs/providers/oci/index.html) and [Oracle Cloud Infrastructure Resource Manager](https://docs.cloud.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) . The provisioned infrastructure can also be used to deploy different utility services that ODA can benefit from like custom channel webhook implementations.
+TThis solution shows how to provision and configure the infrastructure that you need to deploy [Digital Assistant](https://docs.oracle.com/en-us/iaas/digital-assistant/index.html) custom components/webviews to [Oracle Kubernetes Engine (**_OKE_**)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) using either [Oracle Cloud Infrastructure Resource Manager](https://docs.cloud.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) or [Terraform](https://www.terraform.io/docs/providers/oci/index.html). You also can use this infrastructure to deploy different utility services that Digital Assistant can benefit from, like custom channel webhook implementations.
 
-Below is a list of all artifacts that will be provisioned:
+The following list shows all the artifacts that will be provisioned.
 
 | Component                                                                                                           | Description                                         | Default Name             
 |---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------
@@ -16,8 +16,8 @@ Below is a list of all artifacts that will be provisioned:
 
 ## Prerequisite
 
-- You need a user with an **Administrator** privileges to execute the ORM stack or Terraform scripts.
-- Make sure your tenancy has service limits availabilities for the above components in the table.
+- You must belong to a user group with tenancy administrator privileges to complete these steps.
+- Make sure that the newly provisioned artifacts won't cause your tenancy to exceed its service limits.
 
 ## Provision infrastructure using Oracle Resource Manager (ORM)
 
@@ -25,30 +25,31 @@ Below is a list of all artifacts that will be provisioned:
 1. From Oracle Cloud Infrastructure **Console/Resource Manager**, create a new stack.
 1. Make sure you select **My Configurations** and then upload the zip file downloaded in the previous step.
 1. Set a name for the stack and click Next.
-1. Set the required variables values and then Create.
+1. Set the required variables values and then click Create.
     ![create stack](images/create_stack.gif)
 
-1. From the stack details page, Select **Plan** under **Terraform Actions** menu button and make sure it completes successfully.
+1. From the stack details page, click **Terraform Actions**, and then click **Plan**. Ensure that the action completes successfully.
     ![plan](images/plan.png)
 
-1. From the stack details page, Select **Apply** under **Terraform Actions** menu button and make sure it completes successfully.
+1. From the stack details page, click **Terraform Actions**, and then click **Apply**. Ensure that the action completes successfully.
     ![Apply](images/apply.png)
 
-1. To destroy all created artifacts, from the stack details page, Select **Destroy** under **Terraform Actions** menu button and make sure it completes successfully.
+### Destroying The Infrastructure
+
+If you later decide to delete the created artifacts, click **Terraform Actions**, and then click **Destroy**. Ensure that the action completes successfully.
     ![Destroy](images/destroy.png)
 
 ## Provision infrastructure using Terraform
 
-1. Clone repo
+1. Clone this repo
 
    ```
    git clone git clone git clone git@github.com:oracle-quickstart/oci-digital-assistant-external-services.git
    cd oci-digital-assistant-external-services/deploy/terraform
    ```
 
-1. Create a copy of the file **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars.example** in the same directory and name it **terraform.tfvars**.
-1. Open the newly created **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars** file and edit the following sections:
-    * **TF Requirements** : Add your Oracle Cloud Infrastructure user and tenant details:
+1. Create a copy of the **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars.example** file in the same directory and name it **terraform.tfvars**.
+1. Open the newly created **oci-digital-assistant-external-services/deploy/terraform/terraform.tfvars** file and add your Oracle Cloud Infrastructure user and tenant details to the TF Requirements section.
 
         ```
            #*************************************
@@ -69,26 +70,28 @@ Below is a list of all artifacts that will be provisioned:
            fingerprint=""
         ```
 
-1. Initialize terraform provider
+1. Run this command to Initialize the Terraform provider:
 
    ```shell
     terraform init
    ```
 
-1. Plan terraform scripts
+1. To see what components you'll create, and to verify that you can run the terraform scripts successfully, run this command:
 
     ```shell
     terraform plan
    ```
 
-1. Run terraform scripts
+1. To execute the Terraform scripts, run this command:
 
     ```shell
     terraform apply -auto-approve
    ```
 
-1. To Destroy all created artifacts
+### Destroying the infrastructure
 
-    ```shell
+If you later decide to delete the created artifacts, run this command:
+
+```shell
     terraform destroy -auto-approve
-   ```
+```
