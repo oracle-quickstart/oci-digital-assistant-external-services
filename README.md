@@ -9,6 +9,7 @@ The following list shows all the artifacts that will be provisioned.
 | Component                                                                                                           | Description                                         | Default Name             
 |---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|-------------------------
 | [API Gateway](https://docs.cloud.oracle.com/en-us/iaas/Content/APIGateway/Concepts/apigatewayconcepts.htm)          | Oracle Cloud Infrastructure API Gateway             | Digital Assistant API Gateway 
+| [Vault](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm#Overview_of_Vault)        | Oracle Cloud Infrastructure Vault                   | Digital Assistant Vault 
 | [VCN](https://docs.cloud.oracle.com/en-us/iaas/Content/Network/Tasks/managingVCNs.htm#VCNsandSubnets)               | Oracle Cloud Infrastructure VCN                     | Digital Assistant VCN
 | [Subnets](https://docs.cloud.oracle.com/en-us/iaas/Content/Network/Tasks/managingVCNs.htm#VCNsandSubnets)           | Oracle Cloud Infrastructure VCN Subnets             | Digital Assistant - Public <br>Digital Assistant - Private <br>Digital Assistant (OKE LB) - Private
 | [Dynamic Group](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm)          | Oracle Cloud Infrastructure Dynamic Group           | DigitalAssistantDynamicGroup 

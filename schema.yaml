@@ -27,6 +27,8 @@ variableGroups:
       - oke-cluster-name
       - oke-worker-node-shape
       - apigateway_name
+      - provision_vault
+      - vault_name
 
 variables:
   oke-cluster-name:
@@ -42,6 +44,20 @@ variables:
     required: true
     default: "Digital Assistant API Gateway"
 
+  provision_vault:
+    type: boolean
+    title: "Enable Vault Support ?"
+    description: "Create a vault and master encryption key that you manage and can use to encrypt and store credentials."
+    required: true
+    default: true
+
+  vault_name:
+    type: string
+    title: "Name of the Vault to provision"
+    default: "Digital Assistant Vault"
+    required: true
+    visible: provision_vault
+
   oke-worker-node-shape:
     type: oci:core:instanceshape:name
     default: "VM.Standard.E3.Flex"
@@ -50,19 +66,3 @@ variables:
     required: true
     dependsOn:
       compartmentId: ${compartment_ocid}
-
-#  region:
-#    type: oci:identity:region:name
-#    required: true
-#    visible: true
-#
-#  compartment_ocid:
-#    type: oci:identity:compartment:id
-#    required: true
-#    title: "Compartment"
-#    visible: true
-#
-#  tenancy_ocid:
-#    type: string
-#    required: true
-#    visible: false

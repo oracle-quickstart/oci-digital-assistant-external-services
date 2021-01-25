@@ -15,6 +15,28 @@ resource "oci_identity_dynamic_group" "oda-dynamic-group" {
   matching_rule   = "any {all {resource.type='odainstance',resource.compartment.id='${var.compartment_ocid}'} ,all {resource.type='fnfunc',resource.compartment.id='${var.compartment_ocid}'}, all {resource.type='ApiGateway',resource.compartment.id='${var.compartment_ocid}'}, all {instance.compartment.id='${var.compartment_ocid}'} }"
 }
 
+#*************************************
+#              Vault
+#*************************************
+
+resource "oci_kms_vault" "oda-vault" {
+  count = var.provision_vault ? 1 : 0
+  compartment_id = var.compartment_ocid
+  display_name = var.vault_name
+  vault_type = "DEFAULT"
+}
+
+resource "oci_kms_key" "oda-key" {
+  count = var.provision_vault ? 1 : 0
+  compartment_id = var.compartment_ocid
+  display_name = join(" " , [var.vault_name , "Encryption Key"])
+  key_shape {
+    algorithm = "AES"
+    length = 32
+  }
+  management_endpoint = oci_kms_vault.oda-vault[0].management_endpoint
+}
+
 
 #*************************************
 #           Policies

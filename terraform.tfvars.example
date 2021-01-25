@@ -20,6 +20,15 @@ oke-worker-node-ocpu=4
 apigateway_name="Digital Assistant Gateway"
 
 #*************************************
+#    OCI Vault Specific
+#*************************************
+// Should provision vault or not. Default is set to false
+provision_vault = true
+
+// Name of the "OCI Vault"
+vault_name = "Digital Assistant Vault"
+
+#*************************************
 #         Network Specific
 #*************************************
 

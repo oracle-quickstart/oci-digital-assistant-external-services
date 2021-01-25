@@ -41,6 +41,20 @@ variable "apigateway_name" {
 }
 
 #*************************************
+#    OCI Vault Specific
+#*************************************
+
+// Should Provision vault or not
+variable "provision_vault" {
+  default = true
+}
+
+// Vault Name
+variable "vault_name" {
+  default = "Digital Assistant Vault"
+}
+
+#*************************************
 #         Network Specific
 #*************************************
 
