@@ -8,9 +8,11 @@ terraform {
   required_providers {
     helm = {
       source = "hashicorp/helm"
+      version = "1.1.1"
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
+      version = "1.11.2"
     }
     local = {
       source = "hashicorp/local"
