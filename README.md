@@ -2,7 +2,7 @@
 
 ## Introduction
 
-TThis solution shows how to provision and configure the infrastructure that you need to deploy [Digital Assistant](https://docs.oracle.com/en-us/iaas/digital-assistant/index.html) custom components/webviews to [Oracle Kubernetes Engine (**_OKE_**)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) using either [Oracle Cloud Infrastructure Resource Manager](https://docs.cloud.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) or [Terraform](https://www.terraform.io/docs/providers/oci/index.html). You also can use this infrastructure to deploy different utility services that Digital Assistant can benefit from, like custom channel webhook implementations.
+This solution shows how to provision and configure the infrastructure that you need to deploy [Digital Assistant](https://docs.oracle.com/en-us/iaas/digital-assistant/index.html) custom components/webviews to [Oracle Kubernetes Engine (**_OKE_**)](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm) using either [Oracle Cloud Infrastructure Resource Manager](https://docs.cloud.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/resourcemanager.htm) or [Terraform](https://www.terraform.io/docs/providers/oci/index.html). You also can use this infrastructure to deploy different utility services that Digital Assistant can benefit from, like custom channel webhook implementations.
 
 The following list shows all the artifacts that will be provisioned.
 
@@ -15,7 +15,7 @@ The following list shows all the artifacts that will be provisioned.
 | [Dynamic Group](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm)          | Oracle Cloud Infrastructure Dynamic Group           | DigitalAssistantDynamicGroup 
 | [Policies (compartment)](https://docs.cloud.oracle.com/en-us/iaas/Content/Identity/Concepts/policygetstarted.htm)   | Oracle Cloud Infrastructure Security Policies       | DigitalAssistantPolicies
 
-## Prerequisite
+## Prerequisites
 
 - You must belong to a user group with tenancy administrator privileges to complete these steps.
 - Make sure that the newly provisioned artifacts won't cause your tenancy to exceed its service limits.
