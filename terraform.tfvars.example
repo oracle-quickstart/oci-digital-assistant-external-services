@@ -6,7 +6,6 @@
 #*************************************
 #         OKE Specific
 #*************************************
-oke-k8s-version="v1.18.10"
 oke-worker-node-shape="VM.Standard.E3.Flex"
 oke-worker-node-os-version="7.9"
 oke-worker-node-memory=64
@@ -37,6 +36,7 @@ network_cidrs = {
     PUBLIC-SUBNET-REGIONAL-CIDR     = "10.0.0.0/24"
     PRIVATE-SUBNET-REGIONAL-CIDR    = "10.0.1.0/24"
     LB-PRIVATE-SUBNET-REGIONAL-CIDR = "10.0.2.0/24"
+    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "10.0.3.0/24"
     ALL-CIDR                        = "0.0.0.0/0"
 }
 network_names = {
@@ -44,6 +44,7 @@ network_names = {
     PUBLIC-SUBNET-REGIONAL-NAME     = "Digital Assistant - Public"
     PRIVATE-SUBNET-REGIONAL-NAME    = "Digital Assistant - Private"
     LB-PRIVATE-SUBNET-REGIONAL-NAME = "Digital Assistant (OKE LB) - Private"
+    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "Digital Assistant (OKE API) - Public"
 }
 #*************************************
 #           TF Requirements

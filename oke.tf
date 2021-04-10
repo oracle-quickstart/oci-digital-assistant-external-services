@@ -6,12 +6,35 @@
 #                 OKE
 #*************************************
 
+# Get OKE options
+locals {
+  cluster_k8s_latest_version   = reverse(sort(data.oci_containerengine_cluster_option.oke.kubernetes_versions))[0]
+}
+
+# Checks if is using Flexible Compute Shapes
+locals {
+  is_flexible_node_shape = contains(local.compute_flexible_shapes, var.oke-worker-node-shape)
+}
+
+# Dictionary Locals
+locals {
+  compute_flexible_shapes = [
+    "VM.Standard.E3.Flex",
+    "VM.Standard.E4.Flex"
+  ]
+}
+
 // OKE Cluster
 resource "oci_containerengine_cluster" "oda-cc-cluster" {
   compartment_id      = var.compartment_ocid
-  kubernetes_version  = var.oke-k8s-version
+  kubernetes_version  = local.cluster_k8s_latest_version
   name                = var.oke-cluster-name
   vcn_id              = oci_core_vcn.oda-cc-vcn.id
+
+  endpoint_config {
+    is_public_ip_enabled = true
+    subnet_id = oci_core_subnet.oda-public-subnet-oke.id
+  }
 
   options {
     add_ons {
@@ -34,8 +57,14 @@ resource "oci_containerengine_node_pool" "node-pool-1" {
   node_shape          = var.oke-worker-node-shape
   // As we are using flex shape, we have to specify shape details memory/ocpu
   node_shape_config {
-    memory_in_gbs     = var.oke-worker-node-memory
-    ocpus             = var.oke-worker-node-ocpu
+  }
+
+  dynamic "node_shape_config" {
+    for_each = local.is_flexible_node_shape ? [1] : []
+    content {
+      memory_in_gbs     = var.oke-worker-node-memory
+      ocpus             = var.oke-worker-node-ocpu
+    }
   }
 
   node_source_details {

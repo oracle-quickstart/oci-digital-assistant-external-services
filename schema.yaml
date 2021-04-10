@@ -4,6 +4,7 @@
 
 title: Digital Assistant External Services
 description: Digital Assistant External Services
+informationalText: "This stack provision and configure the infrastructure that you need to deploy Digital Assistant custom components/webviews to Oracle Kubernetes Engine (OKE). You also can use this infrastructure to deploy different utility services that Digital Assistant can benefit from, like custom channel webhook implementations."
 schemaVersion: 1.1.0
 version: "20190304"
 locale: "en"
@@ -22,10 +23,12 @@ variableGroups:
       - network_names
     visible: false
 
-  - title: "Configuration"
+  - title: "OKE Configurations"
     variables:
       - oke-cluster-name
       - oke-worker-node-shape
+      - oke-worker-node-ocpu
+      - oke-worker-node-memory
       - apigateway_name
       - provision_vault
       - vault_name
@@ -33,10 +36,49 @@ variableGroups:
 variables:
   oke-cluster-name:
     type: string
-    title: "OKE Cluster Name"
+    title: "Cluster Name"
     default: "Digital Assistant OKE Cluster"
     required: true
     visibe: true
+
+  oke-worker-node-shape:
+    type: oci:core:instanceshape:name
+    default: "VM.Standard.E3.Flex"
+    title: "Worker Nodes Compute Shape"
+    visible: true
+    required: true
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  oke-worker-node-ocpu:
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 64
+    title: "Number of OCPUs"
+    visible:
+      or:
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E3.Flex"
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E4.Flex"
+
+  oke-worker-node-memory:
+    type: integer
+    default: 32
+    minimum: 1
+    maximum: 1024
+    title: "Amount of memory (GB)"
+    visible:
+      or:
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E3.Flex"
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E4.Flex"
 
   apigateway_name:
     type: string
@@ -57,12 +99,3 @@ variables:
     default: "Digital Assistant Vault"
     required: true
     visible: provision_vault
-
-  oke-worker-node-shape:
-    type: oci:core:instanceshape:name
-    default: "VM.Standard.E3.Flex"
-    title: "OKE Worker Nodes Compute Shape"
-    visible: false
-    required: true
-    dependsOn:
-      compartmentId: ${compartment_ocid}

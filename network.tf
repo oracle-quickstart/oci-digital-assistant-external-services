@@ -30,6 +30,18 @@ resource "oci_core_subnet" "oda-public-subnet" {
   security_list_ids           = [oci_core_security_list.oda-public-sl.id]
 }
 
+// Public Subnet for OKE API Endpoint
+resource "oci_core_subnet" "oda-public-subnet-oke" {
+  cidr_block                  = lookup(var.network_cidrs, "OKE-PUBLIC-SUBNET-REGIONAL-CIDR" )
+  compartment_id              = var.compartment_ocid
+  vcn_id                      = oci_core_vcn.oda-cc-vcn.id
+  display_name                = lookup(var.network_names, "OKE-PUBLIC-SUBNET-REGIONAL-CIDR" )
+  prohibit_public_ip_on_vnic  = false // Public Subnet
+  dns_label                   = "odaokepublic"
+  route_table_id              = oci_core_route_table.oda-public-rt-oke.id
+  security_list_ids           = [oci_core_security_list.oda-public-sl-oke.id]
+}
+
 // Private Subnet for OKE Worker Nodes
 resource "oci_core_subnet" "oda-private-subnet" {
   cidr_block                  = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-CIDR" )
@@ -111,6 +123,21 @@ resource "oci_core_route_table" "oda-public-rt" {
 
 }
 
+// Public Subnet Routing Table for OKE API Endpoint
+resource "oci_core_route_table" "oda-public-rt-oke" {
+  compartment_id       = var.compartment_ocid
+  vcn_id               = oci_core_vcn.oda-cc-vcn.id
+  display_name         = "Digital Assistant Public RT (OKE API)"
+
+  // Enable all traffic through Internet Gateway
+  route_rules {
+    network_entity_id  = oci_core_internet_gateway.oda-internet-gateway.id
+    destination        = lookup(var.network_cidrs , "ALL-CIDR" )
+    destination_type   = "CIDR_BLOCK"
+  }
+
+}
+
 // Private Subnet Routing Table for OKE Worker Nodes
 resource "oci_core_route_table" "oda-private-rt" {
   compartment_id        = var.compartment_ocid
@@ -172,6 +199,103 @@ resource "oci_core_security_list" "oda-public-sl" {
     source              = lookup(var.network_cidrs , "ALL-CIDR" )
     source_type         = "CIDR_BLOCK"
     stateless           = false
+  }
+}
+
+// Public Subnet Security List for OKE API Endpoint
+resource "oci_core_security_list" "oda-public-sl-oke" {
+  compartment_id = var.compartment_ocid
+  vcn_id = oci_core_vcn.oda-cc-vcn.id
+  display_name = "Digital Assistant Public SL (OKE API)"
+
+  # Egress - Allow Kubernetes Control Plane to communicate with OKE
+  egress_security_rules {
+    destination = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    protocol = "6" // TCP
+    stateless = false
+    destination_type = "SERVICE_CIDR_BLOCK"
+    description = "All traffic to worker nodes"
+    tcp_options {
+      max = "443"
+      min = "443"
+    }
+
+  }
+
+  # Egress - All traffic to worker nodes
+  egress_security_rules {
+    destination = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    protocol = "All"
+    stateless = false
+    destination_type = "CIDR_BLOCK"
+    description = "All traffic to worker nodes"
+
+  }
+
+  # Egress - Path discovery
+  egress_security_rules {
+    destination = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    protocol = "1" // ICMP
+    stateless = false
+    destination_type = "CIDR_BLOCK"
+    description = "Path discovery"
+    icmp_options {
+      type = "3"
+      code = "4"
+    }
+
+  }
+
+  # Ingress - External access to Kubernetes API endpoint
+  ingress_security_rules {
+    protocol = "6" // TCP
+    source = lookup(var.network_cidrs, "ALL-CIDR" )
+    source_type = "CIDR_BLOCK"
+    stateless = false
+    description = "External access to Kubernetes API endpoint"
+    tcp_options {
+      max = "6443"
+      min = "6443"
+    }
+  }
+
+  # Ingress - Kubernetes worker to Kubernetes API endpoint communication
+  ingress_security_rules {
+    protocol = "6" // TCP
+    source = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    source_type = "CIDR_BLOCK"
+    stateless = false
+    description = "Kubernetes worker to Kubernetes API endpoint communication"
+    tcp_options {
+      max = "6443"
+      min = "6443"
+    }
+  }
+
+  # Ingress - Kubernetes worker to control plane communication
+  ingress_security_rules {
+    protocol = "6" // TCP
+    source = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    source_type = "CIDR_BLOCK"
+    stateless = false
+    description = "Kubernetes worker to control plane communication"
+    tcp_options {
+      max = "12250"
+      min = "12250"
+    }
+  }
+
+  # Ingress - Path discovery
+  ingress_security_rules {
+    protocol = "1" // ICMP
+    source = lookup(var.network_cidrs, "PRIVATE-SUBNET-REGIONAL-NAME" )
+    source_type = "CIDR_BLOCK"
+    stateless = false
+    description = "Path discovery"
+    icmp_options {
+      type = "3"
+      code = "4"
+    }
   }
 }
 

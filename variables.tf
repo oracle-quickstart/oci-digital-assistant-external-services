@@ -9,10 +9,6 @@
 variable "oke-cluster-name" {
   default = "Digital Assistant OKE Cluster"
 }
-// OKE Kubernetes Version
-variable "oke-k8s-version" {
-  default = "v1.18.10"
-}
 
 // OKE Worker Nodes Shape
 variable "oke-worker-node-shape" {
@@ -67,6 +63,7 @@ variable "network_cidrs" {
     PUBLIC-SUBNET-REGIONAL-CIDR     = "10.0.0.0/24"
     PRIVATE-SUBNET-REGIONAL-CIDR    = "10.0.1.0/24"
     LB-PRIVATE-SUBNET-REGIONAL-CIDR = "10.0.2.0/24"
+    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "10.0.3.0/24"
     ALL-CIDR                        = "0.0.0.0/0"
   }
 }
@@ -80,6 +77,7 @@ variable "network_names" {
     PUBLIC-SUBNET-REGIONAL-NAME     = "Digital Assistant - Public"
     PRIVATE-SUBNET-REGIONAL-NAME    = "Digital Assistant - Private"
     LB-PRIVATE-SUBNET-REGIONAL-NAME = "Digital Assistant (OKE LB) - Private"
+    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "Digital Assistant (OKE API) - Public"
   }
 }
 
