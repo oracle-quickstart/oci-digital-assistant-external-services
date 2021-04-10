@@ -3,6 +3,10 @@
 #
 
 
+locals {
+  app_name_normalized = replace(var.app_name, " ", "-")
+}
+
 #*************************************
 #          Dynamic Groups
 #*************************************
@@ -10,8 +14,8 @@
 resource "oci_identity_dynamic_group" "oda-dynamic-group" {
   provider        = oci.home
   compartment_id  = var.tenancy_ocid
-  description     = "Digital Assistant Dynamic Group"
-  name            = "DigitalAssistantDynamicGroup"
+  description     = "${var.app_name} Dynamic Group"
+  name            = "${local.app_name_normalized}DynamicGroup"
   matching_rule   = "any {all {resource.type='odainstance',resource.compartment.id='${var.compartment_ocid}'} ,all {resource.type='fnfunc',resource.compartment.id='${var.compartment_ocid}'}, all {resource.type='ApiGateway',resource.compartment.id='${var.compartment_ocid}'}, all {instance.compartment.id='${var.compartment_ocid}'} }"
 }
 
@@ -20,16 +24,16 @@ resource "oci_identity_dynamic_group" "oda-dynamic-group" {
 #*************************************
 
 resource "oci_kms_vault" "oda-vault" {
-  count = var.provision_vault ? 1 : 0
+  count = var.create_vault ? 1 : 0
   compartment_id = var.compartment_ocid
-  display_name = var.vault_name
+  display_name = "${var.app_name} Vault" //var.vault_name
   vault_type = "DEFAULT"
 }
 
 resource "oci_kms_key" "oda-key" {
-  count = var.provision_vault ? 1 : 0
+  count = var.create_vault ? 1 : 0
   compartment_id = var.compartment_ocid
-  display_name = join(" " , [var.vault_name , "Encryption Key"])
+  display_name = "${var.app_name} Vault Encryption Key"
   key_shape {
     algorithm = "AES"
     length = 32
@@ -45,8 +49,8 @@ resource "oci_kms_key" "oda-key" {
 resource "oci_identity_policy" "oda-policy" {
   provider       = oci.home
   compartment_id = var.compartment_ocid
-  description    = "Digital Assistant Policies"
-  name           = "DigitalAssistantPolicies"
+  description    = "${var.app_name} Policies"
+  name           = "${local.app_name_normalized}Policies"
   statements     = [
     "Allow service FaaS to use virtual-network-family ${data.oci_identity_compartment.current_compartment.id == var.tenancy_ocid ? "in tenancy" : "in compartment ${data.oci_identity_compartment.current_compartment.name}" }" ,
     "Allow dynamic-group ${oci_identity_dynamic_group.oda-dynamic-group.name} to use virtual-network-family ${data.oci_identity_compartment.current_compartment.id == var.tenancy_ocid ? "in tenancy" : "in compartment ${data.oci_identity_compartment.current_compartment.name}" }" ,

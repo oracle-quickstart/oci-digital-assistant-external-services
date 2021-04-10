@@ -9,9 +9,9 @@
 // Gateway
 resource oci_apigateway_gateway oda-gateway {
   compartment_id    = var.compartment_ocid
-  display_name      = var.apigateway_name
+  display_name      = "${var.app_name} API Gateway"
   endpoint_type     = "PUBLIC"
-  subnet_id         = oci_core_subnet.oda-public-subnet.id
+  subnet_id         = var.create_vcn ? oci_core_subnet.oda-public-subnet[0].id : var.existing_public_subnet_id
 }
 
 // Gateway Deployment
@@ -19,8 +19,8 @@ resource "oci_apigateway_deployment" "oda-gateway-deployment" {
   depends_on        = [data.kubernetes_service.ingress-nginx-controller]
   compartment_id    = var.compartment_ocid
   gateway_id        = oci_apigateway_gateway.oda-gateway.id
-  path_prefix       = "/oda"
-  display_name      = "ODA Services Deployment"
+  path_prefix       = var.apigateway_path_prefix
+  display_name      = "${var.app_name} Services Deployment"
 
   // API Gateway Deployment Details
   specification {
