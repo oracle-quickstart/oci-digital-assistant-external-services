@@ -3,12 +3,17 @@
 #
 
 #*************************************
-#         OKE Specific
+#         General
 #*************************************
 
-variable "oke-cluster-name" {
-  default = "Digital Assistant OKE Cluster"
+// Prefix name. Will be used as a name prefix to identify resources, such as OKE, VCN, API Gateway, and others
+variable "app_name" {
+  default = "Digital Assistant"
 }
+
+#*************************************
+#         OKE Specific
+#*************************************
 
 // OKE Worker Nodes Shape
 variable "oke-worker-node-shape" {
@@ -20,39 +25,78 @@ variable "oke-worker-node-os-version" {
 }
 // Worker Node Memory
 variable "oke-worker-node-memory" {
-  default=64
+  default=32
 }
 // Worker Node OCPU
 variable "oke-worker-node-ocpu" {
-  default=4
+  default=2
+}
+// Auto-generate OKE Worker Nodes SSH Key
+variable "oke-worker-nodes-auto-generate-ssh-key" {
+  default = true
+}
+// OKE Worker Nodes SSH Key
+variable "oke-worker-nodes-ssh-key" {
+  default = ""
 }
 
 #*************************************
 #    API Gateway Specific
 #*************************************
 
-// API Gateway Name
-variable "apigateway_name" {
-  default = "Digital Assistant Gateway"
+// API Gateway Path Prefix
+// IMPORTANT: Must start with a leading "/"
+variable "apigateway_path_prefix" {
+  default = "/oda"
 }
 
 #*************************************
 #    OCI Vault Specific
 #*************************************
 
-// Should Provision vault or not
-variable "provision_vault" {
+// Create new vault
+variable "create_vault" {
   default = true
 }
 
-// Vault Name
-variable "vault_name" {
-  default = "Digital Assistant Vault"
+// Existing Vault OCID - Only if "create_vault" is set to "false"
+variable "existing_vault_id" {
+  default = ""
 }
 
 #*************************************
 #         Network Specific
 #*************************************
+
+// Create New VCN
+variable "create_vcn" {
+  default = true
+}
+
+// Existing VCN OCID - Only if "create_vcn" is set to "false"
+variable "existing_vcn_id" {
+  default = ""
+}
+
+// Existing Public Subnet (API Gateway) OCID - Only if "create_vcn" is set to "false"
+variable "existing_public_subnet_id" {
+  default = ""
+}
+
+// Existing Public Subnet (OKE API Endpoint) OCID - Only if "create_vcn" is set to "false"
+variable "existing_public_subnet_id_oke" {
+  default = ""
+}
+
+// Existing Private Subnet (OKE Worker Nodes) OCID - Only if "create_vcn" is set to "false"
+variable "existing_private_subnet_id_oke_nodes" {
+  default = ""
+}
+
+// Existing Private Subnet (OKE Load Balancer) OCID - Only if "create_vcn" is set to "false"
+variable "existing_private_subnet_id_oke_lb" {
+  default = ""
+}
 
 // Network CIDRs
 variable "network_cidrs" {
@@ -67,20 +111,6 @@ variable "network_cidrs" {
     ALL-CIDR                        = "0.0.0.0/0"
   }
 }
-
-// Network Names
-variable "network_names" {
-  type = map(string)
-
-  default = {
-    VCN-NAME                        = "Digital Assistant VCN"
-    PUBLIC-SUBNET-REGIONAL-NAME     = "Digital Assistant - Public"
-    PRIVATE-SUBNET-REGIONAL-NAME    = "Digital Assistant - Private"
-    LB-PRIVATE-SUBNET-REGIONAL-NAME = "Digital Assistant (OKE LB) - Private"
-    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "Digital Assistant (OKE API) - Public"
-  }
-}
-
 
 #*************************************
 #           TF Requirements

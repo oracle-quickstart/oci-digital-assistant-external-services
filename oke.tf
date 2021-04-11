@@ -28,12 +28,12 @@ locals {
 resource "oci_containerengine_cluster" "oda-cc-cluster" {
   compartment_id      = var.compartment_ocid
   kubernetes_version  = local.cluster_k8s_latest_version
-  name                = var.oke-cluster-name
-  vcn_id              = oci_core_vcn.oda-cc-vcn.id
+  name                = "${var.app_name} OKE Cluster" //var.oke-cluster-name
+  vcn_id              = var.create_vcn ? oci_core_vcn.oda-cc-vcn[0].id : var.existing_vcn_id
 
   endpoint_config {
     is_public_ip_enabled = true
-    subnet_id = oci_core_subnet.oda-public-subnet-oke.id
+    subnet_id = var.create_vcn ? oci_core_subnet.oda-public-subnet-oke[0].id : var.existing_public_subnet_id_oke
   }
 
   options {
@@ -44,7 +44,7 @@ resource "oci_containerengine_cluster" "oda-cc-cluster" {
     admission_controller_options {
       is_pod_security_policy_enabled  = false
     }
-    service_lb_subnet_ids             = [oci_core_subnet.oda-private-subnet-lb.id]
+    service_lb_subnet_ids             = [ var.create_vcn ? oci_core_subnet.oda-private-subnet-lb[0].id : var.existing_private_subnet_id_oke_lb]
   }
 }
 
@@ -55,10 +55,8 @@ resource "oci_containerengine_node_pool" "node-pool-1" {
   kubernetes_version  = oci_containerengine_cluster.oda-cc-cluster.kubernetes_version
   name                = "node-pool-1"
   node_shape          = var.oke-worker-node-shape
-  // As we are using flex shape, we have to specify shape details memory/ocpu
-  node_shape_config {
-  }
 
+  // if using flex shape, we have to specify shape details memory/ocpu
   dynamic "node_shape_config" {
     for_each = local.is_flexible_node_shape ? [1] : []
     content {
@@ -78,15 +76,15 @@ resource "oci_containerengine_node_pool" "node-pool-1" {
       for_each              = data.oci_identity_availability_domains.ADs.availability_domains
       content {
         availability_domain = placement_configs.value.name
-        subnet_id           = oci_core_subnet.oda-private-subnet.id
+        subnet_id           = var.create_vcn ? oci_core_subnet.oda-private-subnet[0].id : var.existing_private_subnet_id_oke_nodes
       }
     }
   }
 
-  ssh_public_key = tls_private_key.oke_worker_node_ssh_key.public_key_openssh
+  ssh_public_key = var.oke-worker-nodes-auto-generate-ssh-key ? tls_private_key.oke_worker_node_ssh_key.public_key_openssh : var.oke-worker-nodes-ssh-key
 }
 
-# Generate ssh keys to access Worker Nodes, if generate_public_ssh_key=true, applies to the pool
+# Generate ssh keys to access Worker Nodes
 resource "tls_private_key" "oke_worker_node_ssh_key" {
   algorithm = "RSA"
   rsa_bits  = 2048
