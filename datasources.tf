@@ -63,6 +63,10 @@ data "oci_containerengine_cluster_kube_config" "oke_cluster_kube_config" {
   cluster_id = oci_containerengine_cluster.oda-cc-cluster.id
 }
 
+data "oci_containerengine_cluster_option" "oke" {
+  cluster_option_id = "all"
+}
+
 data "kubernetes_service" "ingress-nginx-controller" {
   depends_on = [helm_release.helm-chart-ingress-nginx]
   metadata {

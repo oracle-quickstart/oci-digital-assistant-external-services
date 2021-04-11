@@ -4,6 +4,7 @@
 
 title: Digital Assistant External Services
 description: Digital Assistant External Services
+informationalText: "This stack provision and configure the infrastructure that you need to deploy Digital Assistant custom components/webviews to Oracle Kubernetes Engine (OKE). You also can use this infrastructure to deploy different utility services that Digital Assistant can benefit from, like custom channel webhook implementations."
 schemaVersion: 1.1.0
 version: "20190304"
 locale: "en"
@@ -19,50 +20,206 @@ variableGroups:
       - private_key_path
       - oke-worker-node-shape
       - network_cidrs
-      - network_names
     visible: false
 
-  - title: "Configuration"
+  - title: "General Configurations"
     variables:
-      - oke-cluster-name
+      - app_name
+    visible: true
+
+  - title: "Network Configurations"
+    variables:
+      - create_vcn
+      - existing_vcn_id
+      - existing_public_subnet_id
+      - existing_public_subnet_id_oke
+      - existing_private_subnet_id_oke_nodes
+      - existing_private_subnet_id_oke_lb
+
+  - title: "OKE Configurations"
+    variables:
       - oke-worker-node-shape
-      - apigateway_name
-      - provision_vault
-      - vault_name
+      - oke-worker-node-ocpu
+      - oke-worker-node-memory
+      - oke-worker-nodes-auto-generate-ssh-key
+      - oke-worker-nodes-ssh-key
+
+  - title: "API Gateway Configurations"
+    variables:
+      - apigateway_path_prefix
+
+  - title: "Vault Configurations"
+    variables:
+      - create_vault
+      - existing_vault_id
 
 variables:
-  oke-cluster-name:
-    type: string
-    title: "OKE Cluster Name"
-    default: "Digital Assistant OKE Cluster"
-    required: true
-    visibe: true
 
-  apigateway_name:
+  app_name:
     type: string
-    title: "API Gateway Name"
+    title: "Prefix Name"
+    description: "Prefix name. Will be used as prefix to identify resources, such as OKE, VCN, API Gateway, and others"
+    default: "Digital Assistant"
     required: true
-    default: "Digital Assistant API Gateway"
+    visible: ${create_vault}
 
-  provision_vault:
+  create_vcn:
     type: boolean
-    title: "Enable Vault Support ?"
-    description: "Create a vault and master encryption key that you manage and can use to encrypt and store credentials."
+    title: "Create New VCN"
     required: true
     default: true
 
-  vault_name:
-    type: string
-    title: "Name of the Vault to provision"
-    default: "Digital Assistant Vault"
+  existing_vcn_id:
+    type: oci:core:vcn:id
+    title: "Select VCN"
     required: true
-    visible: provision_vault
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+    visible:
+      not:
+        - ${create_vcn}
+
+  existing_public_subnet_id:
+    type: oci:core:subnet:id
+    title: "Select API Gateway Public Subnet"
+    description: "API Gateway Public Subnet"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${existing_vcn_id}
+      hidePrivateSubnet: true
+    required: true
+    visible:
+      not:
+        - ${create_vcn}
+
+  existing_public_subnet_id_oke:
+    type: oci:core:subnet:id
+    title: "Select OKE API Endpoint Public Subnet"
+    description: "OKE API Endpoint Public Subnet"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${existing_vcn_id}
+      hidePrivateSubnet: true
+    required: true
+    visible:
+      not:
+        - ${create_vcn}
+
+  existing_private_subnet_id_oke_nodes:
+    type: oci:core:subnet:id
+    title: "Select OKE Worker Nodes Private Subnet"
+    description: "OKE Worker Nodes Private Subnet"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${existing_vcn_id}
+      hidePublicSubnet: true
+    required: true
+    visible:
+      not:
+        - ${create_vcn}
+
+  existing_private_subnet_id_oke_lb:
+    type: oci:core:subnet:id
+    title: "Select OKE Load Balancer Private Subnet"
+    description: "OKE Load Balancer Private Subnet"
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+      vcnId: ${existing_vcn_id}
+      hidePublicSubnet: true
+    required: true
+    visible:
+      not:
+        - ${create_vcn}
 
   oke-worker-node-shape:
     type: oci:core:instanceshape:name
     default: "VM.Standard.E3.Flex"
-    title: "OKE Worker Nodes Compute Shape"
-    visible: false
+    title: "Worker Nodes Compute Shape"
+    visible: true
     required: true
     dependsOn:
       compartmentId: ${compartment_ocid}
+
+  oke-worker-node-ocpu:
+    type: integer
+    default: 2
+    minimum: 1
+    maximum: 64
+    title: "Number of OCPUs"
+    visible:
+      or:
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E3.Flex"
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E4.Flex"
+
+  oke-worker-node-memory:
+    type: integer
+    default: 32
+    minimum: 1
+    maximum: 1024
+    title: "Amount of memory (GB)"
+    visible:
+      or:
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E3.Flex"
+        - eq:
+            - oke-worker-node-shape
+            - "VM.Standard.E4.Flex"
+
+  oke-worker-nodes-auto-generate-ssh-key:
+    type: boolean
+    title: "Auto generate public ssh key?"
+    description: "Auto generate public ssh key for OKE worker nodes"
+    required: true
+    default: true
+
+  oke-worker-nodes-ssh-key:
+    type: oci:core:ssh:publickey
+    title: "Import your own SSH public key"
+    additionalProps:
+      allowMultiple: false
+    required: false
+    pattern: "((^(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)(,((ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+\/]+[=]{0,3})( [^,]*)?)*$"
+    visible:
+      not:
+        - ${oke-worker-nodes-auto-generate-ssh-key}
+
+  apigateway_path_prefix:
+    type: string
+    title: "API Gateway Path Prefix"
+    required: true
+    default: "/oda"
+    description: "API Gateway Path prefix. It must start with a leading '/'"
+    pattern : "^\/[a-zA-Z]+$"
+
+  create_vault:
+    type: boolean
+    title: "Create New Vault"
+    description: "Create a vault and master encryption key that you manage and can use to encrypt and store credentials."
+    required: true
+    default: true
+
+  existing_vault_id:
+    type: oci:kms:vault:id
+    title: "Select Vault"
+    required: true
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+    visible:
+      not:
+        - ${create_vault}
+
+outputGroups:
+  - title: "ODA Custom Component URL"
+    outputs:
+      - oda-cuctomComponents-url
+
+outputs:
+  oda-cuctomComponents-url:
+    type: "copyableString"
+    title: "Custom Components URL"
+    visible: true

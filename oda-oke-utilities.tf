@@ -27,7 +27,7 @@ controller:
   service:
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-internal: "true"
-      service.beta.kubernetes.io/oci-load-balancer-subnet1: ${oci_core_subnet.oda-private-subnet-lb.id}
+      service.beta.kubernetes.io/oci-load-balancer-subnet1: ${ var.create_vcn ? oci_core_subnet.oda-private-subnet-lb[0].id : var.existing_private_subnet_id_oke_lb}
 END
 }
 

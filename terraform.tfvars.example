@@ -2,49 +2,72 @@
 # Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
 #
 
+#*************************************
+#         General
+#*************************************
+
+// Prefix name. Will be used as a name prefix to identify resources, such as OKE, VCN, API Gateway, and others
+app_name = "Digital Assistant"
 
 #*************************************
 #         OKE Specific
 #*************************************
-oke-k8s-version="v1.18.10"
 oke-worker-node-shape="VM.Standard.E3.Flex"
 oke-worker-node-os-version="7.9"
-oke-worker-node-memory=64
-oke-worker-node-ocpu=4
+oke-worker-node-memory=32
+oke-worker-node-ocpu=2
+oke-worker-nodes-auto-generate-ssh-key=true
+oke-worker-nodes-ssh-key=""
 
 #*************************************
 #    API Gateway Specific
 #*************************************
 
-// Name of the "API Gateway"
-apigateway_name="Digital Assistant Gateway"
+// API Gateway Path Prefix
+// IMPORTANT: Must start with a leading "/"
+apigateway_path_prefix = "/oda"
 
 #*************************************
 #    OCI Vault Specific
 #*************************************
-// Should provision vault or not. Default is set to false
-provision_vault = true
+// Create new vault
+create_vault = true
 
-// Name of the "OCI Vault"
-vault_name = "Digital Assistant Vault"
+// Existing Vault OCID - Only if "create_vault" is set to "false"
+existing_vault_id = ""
 
 #*************************************
 #         Network Specific
 #*************************************
 
+// Create New VCN
+create_vcn = true
+
+// Existing VCN OCID - Only if "create_vcn" is set to "false"
+existing_vcn_id = ""
+
+// Existing Public Subnet (API Gateway) OCID - Only if "create_vcn" is set to "false"
+existing_public_subnet_id = ""
+
+// Existing Public Subnet (OKE API Endpoint) OCID - Only if "create_vcn" is set to "false"
+existing_public_subnet_id_oke = ""
+
+// Existing Private Subnet (OKE Worker Nodes) OCID - Only if "create_vcn" is set to "false"
+existing_private_subnet_id_oke_nodes = ""
+
+// Existing Private Subnet (OKE Load Balancer) OCID - Only if "create_vcn" is set to "false"
+existing_private_subnet_id_oke_lb = ""
+
+// Network CIDRs
 network_cidrs = {
     VCN-CIDR                        = "10.0.0.0/16"
     PUBLIC-SUBNET-REGIONAL-CIDR     = "10.0.0.0/24"
     PRIVATE-SUBNET-REGIONAL-CIDR    = "10.0.1.0/24"
     LB-PRIVATE-SUBNET-REGIONAL-CIDR = "10.0.2.0/24"
+    OKE-PUBLIC-SUBNET-REGIONAL-CIDR = "10.0.3.0/24"
     ALL-CIDR                        = "0.0.0.0/0"
 }
-network_names = {
-    VCN-NAME                        = "Digital Assistant VCN"
-    PUBLIC-SUBNET-REGIONAL-NAME     = "Digital Assistant - Public"
-    PRIVATE-SUBNET-REGIONAL-NAME    = "Digital Assistant - Private"
-    LB-PRIVATE-SUBNET-REGIONAL-NAME = "Digital Assistant (OKE LB) - Private"
-}
+
 #*************************************
 #           TF Requirements
 #*************************************
