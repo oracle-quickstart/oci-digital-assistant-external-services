@@ -6,7 +6,7 @@
 #         General
 #*************************************
 
-// Prefix name. Will be used as prefix to identify resources, such as OKE, VCN, API Gateway, and others
+// Prefix name. Will be used as a name prefix to identify resources, such as OKE, VCN, API Gateway, and others
 variable "app_name" {
   default = "Digital Assistant"
 }
@@ -59,7 +59,7 @@ variable "create_vault" {
   default = true
 }
 
-// Existing Vault OCID
+// Existing Vault OCID - Only if "create_vault" is set to "false"
 variable "existing_vault_id" {
   default = ""
 }
@@ -73,27 +73,27 @@ variable "create_vcn" {
   default = true
 }
 
-// Existing VCN OCID
+// Existing VCN OCID - Only if "create_vcn" is set to "false"
 variable "existing_vcn_id" {
   default = ""
 }
 
-// Existing Public Subnet (API Gateway) OCID
+// Existing Public Subnet (API Gateway) OCID - Only if "create_vcn" is set to "false"
 variable "existing_public_subnet_id" {
   default = ""
 }
 
-// Existing Public Subnet (OKE API Endpoint) OCID
+// Existing Public Subnet (OKE API Endpoint) OCID - Only if "create_vcn" is set to "false"
 variable "existing_public_subnet_id_oke" {
   default = ""
 }
 
-// Existing Private Subnet (OKE Worker Nodes) OCID
+// Existing Private Subnet (OKE Worker Nodes) OCID - Only if "create_vcn" is set to "false"
 variable "existing_private_subnet_id_oke_nodes" {
   default = ""
 }
 
-// Existing Private Subnet (OKE Load Balancer) OCID
+// Existing Private Subnet (OKE Load Balancer) OCID - Only if "create_vcn" is set to "false"
 variable "existing_private_subnet_id_oke_lb" {
   default = ""
 }
