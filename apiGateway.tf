@@ -9,7 +9,7 @@
 // Gateway
 resource oci_apigateway_gateway oda-gateway {
   compartment_id    = var.compartment_ocid
-  display_name      = "${var.app_name} API Gateway"
+  display_name      = "${var.prefix_name} API Gateway"
   endpoint_type     = "PUBLIC"
   subnet_id         = var.create_vcn ? oci_core_subnet.oda-public-subnet[0].id : var.existing_public_subnet_id
 }
@@ -20,7 +20,7 @@ resource "oci_apigateway_deployment" "oda-gateway-deployment" {
   compartment_id    = var.compartment_ocid
   gateway_id        = oci_apigateway_gateway.oda-gateway.id
   path_prefix       = var.apigateway_path_prefix
-  display_name      = "${var.app_name} Services Deployment"
+  display_name      = "${var.prefix_name} Services Deployment"
 
   // API Gateway Deployment Details
   specification {
@@ -55,7 +55,7 @@ resource "oci_apigateway_deployment" "oda-gateway-deployment" {
       backend {
         type                    = "HTTP_BACKEND"
         is_ssl_verify_disabled  = "true"
-        url                     = "http://${data.kubernetes_service.ingress-nginx-controller.load_balancer_ingress[0].ip}/$${request.path[skillName]}/components"
+        url                     = "http://${local.ingress_ip}/$${request.path[skillName]}/components"
       }
       // Route specific logging policies
       logging_policies {
@@ -76,7 +76,7 @@ resource "oci_apigateway_deployment" "oda-gateway-deployment" {
       backend {
         type                    = "HTTP_BACKEND"
         is_ssl_verify_disabled  = "true"
-        url                     = "http://${data.kubernetes_service.ingress-nginx-controller.load_balancer_ingress[0].ip}/$${request.path[skillName]}/components/$${request.path[componentName]}"
+        url                     = "http://${local.ingress_ip}/$${request.path[skillName]}/components/$${request.path[componentName]}"
       }
       // Route specific logging policies
       logging_policies {

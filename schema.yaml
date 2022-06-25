@@ -24,7 +24,7 @@ variableGroups:
 
   - title: "General Configurations"
     variables:
-      - app_name
+      - prefix_name
     visible: true
 
   - title: "Network Configurations"
@@ -55,13 +55,12 @@ variableGroups:
 
 variables:
 
-  app_name:
+  prefix_name:
     type: string
     title: "Prefix Name"
     description: "Prefix name. Will be used as prefix to identify resources, such as OKE, VCN, API Gateway, and others"
     default: "Digital Assistant"
     required: true
-    visible: ${create_vault}
 
   create_vcn:
     type: boolean

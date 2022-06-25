@@ -28,22 +28,32 @@ controller:
     annotations:
       service.beta.kubernetes.io/oci-load-balancer-internal: "true"
       service.beta.kubernetes.io/oci-load-balancer-subnet1: ${ var.create_vcn ? oci_core_subnet.oda-private-subnet-lb[0].id : var.existing_private_subnet_id_oke_lb}
+      service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+      service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+      service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "100"
 END
 }
 
-// Create an Kubernetes Ingress Resource
-resource "kubernetes_ingress" "oda-services-ingress" {
+// Create an Kubernetes Ingress Resource - Terraform
+resource "kubernetes_ingress_v1" "oda-services-ingress" {
   depends_on = [helm_release.helm-chart-taerfik]
   metadata {
-    name     = "oda-oke-services-ingress"
+    name = "${lower(local.prefix_name_normalized)}-services-ingress"
+    annotations = {
+      "kubernetes.io/ingress.class" = "nginx"
+    }
   }
   spec {
     rule {
       http {
         path {
           backend {
-            service_name = "oda-oke-services-traefik"
-            service_port = 80
+            service {
+              name = "${lower(local.prefix_name_normalized)}-services-traefik"
+              port {
+                number = 80
+              }
+            }
           }
           path = "/"
         }
@@ -52,6 +62,29 @@ resource "kubernetes_ingress" "oda-services-ingress" {
   }
 }
 
+// Create an Kubernetes Ingress Resource - ORM
+#resource "kubernetes_ingress" "oda-services-ingress" {
+#  depends_on = [helm_release.helm-chart-taerfik]
+#  metadata {
+#    name = "${lower(local.prefix_name_normalized)}-services-ingress"
+#    annotations = {
+#      "kubernetes.io/ingress.class" = "nginx"
+#    }
+#  }
+#  spec {
+#    rule {
+#      http {
+#        path {
+#          backend {
+#            service_name = "${lower(local.prefix_name_normalized)}-services-traefik"
+#            service_port = 80
+#          }
+#          path = "/"
+#        }
+#      }
+#    }
+#  }
+#}
 
 #*************************************
 #        Taerfik Edge Router
@@ -59,10 +92,9 @@ resource "kubernetes_ingress" "oda-services-ingress" {
 
 // Taerfik Edge Router Helm Chart
 resource "helm_release" "helm-chart-taerfik" {
-  name       = "oda-oke-services"
-  repository = "https://containous.github.io/traefik-helm-chart"
+  name       = "${lower(local.prefix_name_normalized)}-services"
+  repository = "https://helm.traefik.io/traefik"
   chart      = "traefik"
-  timeout    = 600000
   wait       = true
   depends_on = [helm_release.helm-chart-ingress-nginx]
   values = [
