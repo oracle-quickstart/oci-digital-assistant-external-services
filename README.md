@@ -26,11 +26,11 @@ The following list shows all the artifacts that will be provisioned.
 
 The simplest way to provision the infrastructure is to click on the **Deploy to Oracle Cloud** button.
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-digital-assistant-external-services/releases/download/V1.0.2/oci-digital-assistant-external-services-v1.0.2.zip)
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-digital-assistant-external-services/releases/download/V1.0.3/oci-digital-assistant-external-services-v1.0.3.zip)
 
 Or you can manually install the stack by following the below steps:
 
-1. Download [`oci-digital-assistant-external-services-v1.0.2.zip`](../../releases/download/V1.0.2/oci-digital-assistant-external-services-v1.0.2.zip) file
+1. Download [`oci-digital-assistant-external-services-v1.0.3.zip`](../../releases/download/V1.0.3/oci-digital-assistant-external-services-v1.0.3.zip) file
 1. From Oracle Cloud Infrastructure **Console/Resource Manager**, create a new stack.
 1. Make sure you select **My Configurations** and then upload the zip file downloaded in the previous step.
 1. Set a name for the stack and click Next.
