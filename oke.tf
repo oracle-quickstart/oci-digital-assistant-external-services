@@ -6,29 +6,11 @@
 #                 OKE
 #*************************************
 
-# Get OKE options
-locals {
-  cluster_k8s_latest_version   = reverse(sort(data.oci_containerengine_cluster_option.oke.kubernetes_versions))[0]
-}
-
-# Checks if is using Flexible Compute Shapes
-locals {
-  is_flexible_node_shape = contains(local.compute_flexible_shapes, var.oke-worker-node-shape)
-}
-
-# Dictionary Locals
-locals {
-  compute_flexible_shapes = [
-    "VM.Standard.E3.Flex",
-    "VM.Standard.E4.Flex"
-  ]
-}
-
 // OKE Cluster
 resource "oci_containerengine_cluster" "oda-cc-cluster" {
   compartment_id      = var.compartment_ocid
   kubernetes_version  = local.cluster_k8s_latest_version
-  name                = "${var.app_name} OKE Cluster" //var.oke-cluster-name
+  name                = "${var.prefix_name} Cluster"
   vcn_id              = var.create_vcn ? oci_core_vcn.oda-cc-vcn[0].id : var.existing_vcn_id
 
   endpoint_config {

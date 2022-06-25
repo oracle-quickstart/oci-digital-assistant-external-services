@@ -7,7 +7,7 @@
 #*************************************
 
 // Prefix name. Will be used as a name prefix to identify resources, such as OKE, VCN, API Gateway, and others
-variable "app_name" {
+variable "prefix_name" {
   default = "Digital Assistant"
 }
 

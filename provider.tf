@@ -3,16 +3,14 @@
 # 
 
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 1.1"
 
   required_providers {
     helm = {
       source = "hashicorp/helm"
-      version = "1.1.1"
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
-      version = "1.11.2"
     }
     local = {
       source = "hashicorp/local"
@@ -30,6 +28,8 @@ terraform {
 provider "oci" {
   region            = var.region
   tenancy_ocid      = var.tenancy_ocid
+
+  # Uncomment the below if you are running locally using your laptop
   user_ocid         = var.user_ocid
   fingerprint       = var.fingerprint
   private_key_path  = var.private_key_path
@@ -41,6 +41,8 @@ provider "oci" {
   alias             = "home"
   region            = lookup(data.oci_identity_regions.home-region.regions[0], "name")
   tenancy_ocid      = var.tenancy_ocid
+
+  # Uncomment the below if you are running locally using your laptop
   user_ocid         = var.user_ocid
   fingerprint       = var.fingerprint
   private_key_path  = var.private_key_path
@@ -49,38 +51,24 @@ provider "oci" {
 
 // Kubernetes
 provider "kubernetes" {
-  load_config_file       = "false"
-  cluster_ca_certificate = base64decode(yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["clusters"][0]["cluster"]["certificate-authority-data"])
-  host                   = yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["clusters"][0]["cluster"]["server"]
+  host                   = local.cluster_endpoint
+  cluster_ca_certificate = local.cluster_ca_certificate
   exec {
-    api_version = "client.authentication.k8s.io/v1beta1" # Workaround for tf k8s provider < 1.11.1 to work with orm - yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["apiVersion"]
-    args        = [yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][0],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][1],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][2],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][3],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][4],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][5],
-      yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][6]]
-    command     = yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["command"]
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["ce", "cluster", "generate-token", "--cluster-id", local.cluster_id, "--region", local.cluster_region]
+    command     = "oci"
   }
 }
 
 // Helm
 provider "helm" {
   kubernetes {
-    load_config_file       = "false"
-    cluster_ca_certificate = base64decode(yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["clusters"][0]["cluster"]["certificate-authority-data"])
-    host                   = yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["clusters"][0]["cluster"]["server"]
+    host                   = local.cluster_endpoint
+    cluster_ca_certificate = local.cluster_ca_certificate
     exec {
-      api_version = yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["apiVersion"]
-      args        = [yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][0],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][1],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][2],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][3],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][4],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][5],
-        yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["args"][6]]
-      command     = yamldecode(data.oci_containerengine_cluster_kube_config.oke_cluster_kube_config.content)["users"][0]["user"]["exec"]["command"]
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["ce", "cluster", "generate-token", "--cluster-id", local.cluster_id, "--region", local.cluster_region]
+      command     = "oci"
     }
   }
 }
