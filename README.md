@@ -161,5 +161,22 @@ If you later decide to delete the created artifacts, run this command:
     terraform destroy -auto-approve
 ```
 
+## Contributing
+
+This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+
+## Security
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## License
+
+Copyright (c) 2018-2022 Oracle and/or its affiliates.
+
+*Replace this statement if your project is not licensed under the UPL*
+
+Released under the Universal Permissive License v1.0 as shown at
+<https://oss.oracle.com/licenses/upl/>.
+
 [magic_button]: https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg
 [magic_stack]: https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-digital-assistant-external-services/releases/download/V1.0.1/oci-digital-assistant-external-services-v1.0.1.zip
